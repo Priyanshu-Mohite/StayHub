@@ -143,6 +143,9 @@ app.get("/testListing", async (req, res) => {
   }
 });
 
+app.get("/", (req, res) => {
+  res.redirect("/listings");
+});
 
 app.use("/listings", listingRouter);
 
