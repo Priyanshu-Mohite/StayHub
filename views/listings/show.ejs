@@ -37,7 +37,7 @@
           <div class="pb-4 border-bottom">
             <h5 class="fw-semibold mb-3" style="font-size: 1.3rem">About this place</h5>
             <p class="text-secondary lh-lg" style="font-size: 0.95rem">
-              Owned by: <%= listing.owner.username %>
+              Owned by: <%= listing.owner ? listing.owner.username : "Unknown Owner (Deleted)" %>
             </p>
             <p class="text-secondary lh-lg" style="font-size: 0.95rem">
               <%= listing.description %>
