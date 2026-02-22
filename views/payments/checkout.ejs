@@ -1,0 +1,100 @@
+<% layout('/layouts/boilerplate') %>
+
+<div class="container mt-5 mb-5">
+    <div class="row">
+        
+        <div class="col-md-6 offset-md-1">
+            <h3 class="mb-4">Complete your payment</h3>
+            <div class="card mb-3 shadow-sm" style="border-radius: 15px; overflow: hidden;">
+                <div class="row g-0">
+                    <div class="col-md-4">
+                        <img src="<%= listing.image.url %>" class="img-fluid rounded-start" alt="listing-image" style="height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h5 class="card-title"><%= listing.title %></h5>
+                            <p class="card-text text-muted"><%= listing.location %>, <%= listing.country %></p>
+                            <hr>
+                            <div class="d-flex justify-content-between">
+                                <span>Price per night:</span>
+                                <span>&#8377; <%= listing.price.toLocaleString("en-IN") %></span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>Total Nights:</span>
+                                <span><%= nights %></span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between fw-bold fs-5">
+                                <span>Total Pay:</span>
+                                <span>&#8377; <%= totalAmount.toLocaleString("en-IN") %></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow border-0 p-4" style="border-radius: 15px;">
+                <h4 class="mb-3">Pay with Card</h4>
+                <form id="payment-form">
+                    <div id="payment-element"></div>
+                    <button id="submit" class="btn btn-primary w-100 mt-3 btn-lg" style="background-color: #fe424d; border: none;">
+                        Pay &#8377;<%= totalAmount.toLocaleString("en-IN") %>
+                    </button>
+                    <div id="error-message" class="text-danger mt-2 small"></div>
+                </form>
+            </div>
+        </div>
+
+
+<script src="https://js.stripe.com/v3/"></script>
+
+<script>
+    const stripe = Stripe("<%= key %>");
+    
+    // URL se Data Nikalo (Query Params)
+    // URL aisa dikhta hai: /checkout?listingId=123&checkIn=2025-01-20&checkOut=2025-01-25
+    const urlParams = new URLSearchParams(window.location.search);
+    const listingId = urlParams.get('listingId');
+    const checkIn = urlParams.get('checkIn');  // Ye naya hai
+    const checkOut = urlParams.get('checkOut'); // Ye bhi naya hai
+
+    let elements;
+
+    async function loadPaymentForm() {
+        // Backend ko Dates bhejo, Paisa wo khud dekh lega
+        const response = await fetch("/create-payment-intent", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+                listingId: listingId,
+                checkIn: checkIn,
+                checkOut: checkOut
+            }) 
+        });
+
+        const { clientSecret } = await response.json();
+
+        elements = stripe.elements({ clientSecret });
+        const paymentElement = elements.create("payment");
+        paymentElement.mount("#payment-element");
+    }
+
+    loadPaymentForm();
+
+    document.querySelector("#payment-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const { error } = await stripe.confirmPayment({
+            elements,
+            confirmParams: {
+                // Success hone par kahan jana hai
+                return_url: "http://localhost:8080/success", 
+            },
+        });
+
+        if (error) {
+            document.getElementById("error-message").innerText = error.message;
+        }
+    });
+</script>

@@ -1,0 +1,57 @@
+<% layout('/layouts/boilerplate') %>
+
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+
+      <div class="card border-0 shadow-lg rounded-4 text-center p-5 booking-success-card">
+        
+        <!-- Success Icon -->
+        <div class="success-icon mb-4">
+          🎉
+        </div>
+
+        <!-- Heading -->
+        <h2 class="fw-bold mb-2">Booking Confirmed!</h2>
+        <p class="text-muted mb-4">
+          Your trip is officially booked. Get ready to make memories ✨
+        </p>
+
+        <!-- Decorative Divider -->
+        <div class="divider mb-4"></div>
+
+        <!-- Info Box -->
+        <div class="bg-light rounded-3 p-4 mb-4 text-start">
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted">Listing</span>
+            <strong><%= booking.listing.title %></strong>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted">Check-in</span>
+            <strong><%= booking.checkIn.toLocaleDateString('en-IN') %></strong>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted">Check-out</span>
+            <strong><%= booking.checkOut.toLocaleDateString('en-IN') %></strong>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="text-muted">Guests</span>
+            <strong><%= booking.guests %></strong>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="d-flex gap-3 justify-content-center">
+          <a href="/bookings" class="btn btn-dark rounded-pill px-4">
+            View My Bookings
+          </a>
+          <a href="/listings" class="btn btn-outline-secondary rounded-pill px-4">
+            Book Another Trip
+          </a>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>

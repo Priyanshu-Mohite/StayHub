@@ -1,0 +1,185 @@
+<% layout("/layouts/boilerplate") %>
+
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+  crossorigin=""
+/>
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+  crossorigin=""
+></script>
+
+<style>
+  /* Sirf Search page ke liye Map styling */
+  #map-container {
+    height: 80vh; /* Map ki height */
+    width: 100%;
+    position: sticky; /* Map chipka rahega */
+    top: 100px;
+    right: 0;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  #map {
+    height: 100%;
+    width: 100%;
+  }
+  .listing-link {
+    text-decoration: none;
+  }
+
+  /* Custom Map Marker (Airbnb Style Pill) */
+.price-marker {
+    background-color: white;
+    color: black;
+    border-radius: 20px; /* Pill shape */
+    padding: 6px 10px;   /* Thoda padding andar */
+    font-weight: 700;    /* Bold text */
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.18); /* Shadow taaki utha hua lage */
+    border: 1px solid rgba(0,0,0,0.08);
+    
+    /* Important for auto-width */
+    white-space: nowrap; 
+    width: fit-content;
+    
+    /* Centering logic */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Hover State (Jab Highlight hoga - Black Pill) */
+.price-marker.highlight {
+    background-color: #222; /* Dark color like Airbnb */
+    color: white;
+    transform: scale(1.1); /* Thoda bada */
+    border-color: #222;
+    z-index: 1000 !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+</style>
+
+<div class="container-fluid mt-3">
+  <h3>Search Results</h3>
+
+  <div class="row">
+    <div class="col-lg-8 col-md-12 col-sm-12">
+      <div class="row row-cols-lg-2 row-cols-md-2 row-cols-sm-1 mt-3">
+        <% if(allListings.length === 0) { %>
+        <div class="alert alert-danger col-12 ms-2" role="alert">
+          No listings found matching your search.
+        </div>
+        <% } %> <% for(let listing of allListings) { %>
+        <a href="/listings/<%= listing._id %>" class="listing-link">
+          <div class="card col listing-card ms-2 mb-4" id="listing-<%= listing._id %>" style="border: 1px solid #ddd; padding: 10px;">
+            <div class="row g-0">
+              <div class="col-md-5">
+                <img
+                  src="<%= listing.image.url %>"
+                  class="img-fluid rounded-start"
+                  alt="listing_image"
+                  style="height: 150px; width: 100%; object-fit: cover"
+                />
+              </div>
+              <div class="col-md-7">
+                <div class="card-body">
+                  <h5 class="card-title text-dark"><%= listing.title %></h5>
+                  <p class="card-text text-muted">
+                    <%= listing.location %>, <%= listing.country %>
+                  </p>
+                  <p class="card-text fw-bold text-dark">
+                    &#8377; <%= listing.price.toLocaleString("en-IN") %> / night
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </a>
+        <% } %>
+      </div>
+    </div>
+
+    <div class="col-lg-4 d-none d-lg-block">
+      <div id="map-container">
+        <div id="map"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    // 1. Map Init
+    const map = L.map('map').setView([20.5937, 78.9629], 5); 
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    const listings = <%- JSON.stringify(allListings) %>;
+    const markers = {}; // Markers store karne ke liye
+
+    var bounds = L.latLngBounds();
+
+    for(let listing of listings) {
+        if(listing.geometry && listing.geometry.coordinates.length > 0) {
+            let lat = listing.geometry.coordinates[1];
+            let lng = listing.geometry.coordinates[0];
+            
+            // 2. Custom Marker Banao (Airbnb Style)
+            const priceIcon = L.divIcon({
+                className: 'custom-leaflet-icon', // Leaflet ki default class hata ne ke liye dummy class
+                // Andar wala div 'price-marker' class use karega jo humne CSS mein banayi hai
+                html: `<div class="price-marker" id="marker-${listing._id}">
+                         &#8377; ${listing.price.toLocaleString("en-IN")}
+                       </div>`,
+                iconSize: null, // 🔥 IMPORTANT: Isse div text ke hisaab se fail jayega
+                iconAnchor: [20, 20] // Thoda center adjust karne ke liye
+            });
+
+            const marker = L.marker([lat, lng], {icon: priceIcon})
+                .addTo(map);
+            
+            markers[listing._id] = marker; // Store marker
+
+            // Popup add karo (Click karne par details)
+            marker.bindPopup(`
+                <div style="text-align: center;">
+                    <b>${listing.title}</b><br>
+                    &#8377; ${listing.price.toLocaleString("en-IN")}/night
+                </div>
+            `);
+
+            bounds.extend([lat, lng]);
+
+            // 3. Link Card Hover to Marker
+            const card = document.getElementById(`listing-${listing._id}`);
+            if (card) {
+                // Mouse Enter (Turn Black)
+                card.addEventListener('mouseenter', () => {
+                    const markerElement = document.getElementById(`marker-${listing._id}`);
+                    if (markerElement) {
+                        markerElement.classList.add('highlight');
+                        marker.setZIndexOffset(1000); // Sabse upar dikhega
+                    }
+                });
+
+                // Mouse Leave (Back to White)
+                card.addEventListener('mouseleave', () => {
+                    const markerElement = document.getElementById(`marker-${listing._id}`);
+                    if (markerElement) {
+                        markerElement.classList.remove('highlight');
+                        marker.setZIndexOffset(0);
+                    }
+                });
+            }
+        }
+    }
+
+    if(listings.length > 0) {
+        map.fitBounds(bounds, {padding: [50, 50]});
+    }
+</script>

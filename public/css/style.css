@@ -1,0 +1,658 @@
+body {
+  font-family: "Plus Jakarta Sans", sans-serif !important;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.container {
+  flex: 1;
+}
+
+/* --- Navbar Styling --- */
+.navbar {
+  background: #ffffff !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 0.95rem 0 !important;
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+  color: #ff385c !important;
+  transition: transform 0.2s ease;
+}
+
+.navbar-brand:hover {
+  transform: scale(1.1);
+}
+
+.navbar-nav .nav-link {
+  color: #222222 !important;
+  font-weight: 500;
+  padding: 0.5rem 1rem !important;
+  margin: 0 0.25rem;
+  border-radius: 22px;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+}
+
+.navbar-nav .nav-link:hover {
+  background-color: #f7f7f7;
+  color: #ff385c !important;
+}
+
+.navbar-nav .nav-link i {
+  margin-right: 0.35rem;
+}
+
+.nav-link.airbnb-home {
+  color: #ff385c !important;
+  font-weight: 600;
+}
+
+.nav-link.airbnb-home:hover {
+  background-color: #fff5f7;
+}
+
+.navbar-toggler {
+  border: none;
+}
+
+.navbar-toggler:focus {
+  box-shadow: none;
+}
+
+/* --- Search Bar Styling (Desktop & General) --- */
+.search-form {
+  max-width: 400px;
+  width: 100%;
+}
+
+.search-container {
+  position: relative;
+  width: 100%;
+}
+
+.search-input {
+  border-radius: 50px !important;
+  padding: 0.65rem 3.5rem 0.65rem 1.5rem !important;
+  border: 1px solid #ddd !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08) !important;
+  transition: all 0.3s ease !important;
+  font-size: 0.95rem;
+}
+
+.search-input:focus {
+  outline: none !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+  border-color: #222 !important;
+}
+
+.search-input::placeholder {
+  color: #999;
+  font-weight: 400;
+}
+
+.search-btn {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #ff385c;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.search-btn:hover {
+  background: #e31c5f;
+  transform: translateY(-50%) scale(1.05);
+}
+
+.search-btn i {
+  font-size: 0.9rem;
+}
+
+/* --- Mobile Specific Search Styling --- */
+/* (Agar tu alag mobile input use kar raha hai toh ye zaroori hai) */
+.search-input-mobile {
+  border-radius: 50px !important;
+  padding: 0.5rem 2.5rem 0.5rem 1rem !important;
+  border: 1px solid #ddd !important;
+  font-size: 0.85rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  width: 100%;
+}
+
+.search-btn-mobile {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #ff385c;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.search-btn-mobile i {
+  font-size: 0.75rem;
+}
+
+
+/* --- Filters & Tax Switch --- */
+#filters {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  overflow-x: auto;
+  width: 100%;
+  padding-bottom: 1rem;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+#filters::-webkit-scrollbar {
+  display: none;
+}
+
+.filter {
+  margin-top: 1rem;
+  text-align: center;
+  margin-right: 1.7rem;
+  opacity: 0.7;
+  cursor: pointer;
+  transition: opacity 0.2s, border-bottom 0.2s;
+  min-width: 60px;
+  border-bottom: 2px solid transparent;
+  flex-shrink: 0;
+}
+
+.filter:hover {
+  opacity: 1;
+  border-bottom: 2px solid #ddd;
+}
+
+.filter p {
+  font-size: 0.8rem;
+}
+
+.tax-info {
+  display: none;
+}
+
+.tax-toggle {
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  height: 3.25rem;
+  padding: 0.5rem 1rem;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.tax-toggle:hover {
+  border-color: #b0b0b0;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12);
+}
+
+.form-check-reverse {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.form-check-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #222;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.form-check-input:checked {
+  background-color: #fe424d !important;
+  border-color: #fe424d !important;
+}
+
+.form-check-input:focus {
+  box-shadow: none !important;
+}
+
+
+/* --- Cards & General UI --- */
+.listing-link {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.listing-link:hover .card {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15) !important;
+}
+
+.card {
+  border: none !important;
+  border-radius: 1rem !important;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  background: linear-gradient(145deg, #ffffff, #f8f9fa);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-img-top {
+  height: 200px;
+  object-fit: cover;
+  width: 100%;
+  border-radius: 1rem !important;
+}
+
+.card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+  margin-top: 1rem;
+  line-height: 1.4;
+}
+
+.card-text {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #e74c3c;
+  margin-top: auto;
+}
+
+.text-muted {
+  font-size: 0.8rem;
+  color: #666 !important;
+  margin-top: 0.5rem;
+}
+
+.card-body {
+  padding: 0.75rem !important;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  text-align: left;
+}
+
+.card-text p {
+  font-weight: 400 !important;
+  margin: 0;
+}
+
+.card-img-overlay {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card-img-overlay:hover {
+  opacity: 0.2;
+  background-color: white !important;
+}
+
+.add-btn, .edit-btn {
+  background-color: #fe424d !important;
+  border: none !important;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s ease;
+}
+
+.add-btn:hover, .edit-btn:hover {
+  background-color: #e31c5f !important;
+  transform: scale(1.05);
+}
+
+.show-img {
+  height: 300px;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* Responsive Grid Adjustments */
+@media (max-width: 1200px) {
+  .card-img-top {
+    height: 180px;
+  }
+  
+  .card-title {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .card-img-top {
+    height: 200px;
+  }
+  
+  .card-title {
+    font-size: 1rem;
+  }
+  
+  .card-text {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .card-img-top {
+    height: 180px;
+  }
+  
+  .card-title {
+    font-size: 0.95rem;
+    margin-top: 0.75rem;
+  }
+  
+  .card-body {
+    padding: 0.6rem !important;
+  }
+  
+  .card-text {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .card-img-top {
+    height: 160px;
+  }
+  
+  .card-title {
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+  
+  .card-body {
+    padding: 0.5rem !important;
+  }
+  
+  .card-text {
+    font-size: 0.9rem;
+  }
+  
+  .text-muted {
+    font-size: 0.75rem;
+  }
+}
+
+/* --- Review Section --- */
+.review-card {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 20px;
+  background: #fff;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.review-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05) !important;
+}
+
+.avatar-circle {
+  width: 42px;
+  height: 42px;
+  background: #222;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+/* --- Footer --- */
+.f-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding: 1.5rem 1rem;
+  background-color: #ebebeb;
+  text-align: center;
+}
+
+.f-info-socials i {
+  margin: 0 0.6rem;
+  font-size: 1.3rem;
+  color: #555;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.f-info-socials i:hover {
+  color: #333;
+}
+
+.f-info-brand {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.f-info-links a {
+  margin: 0 0.6rem;
+  font-size: 0.9rem;
+  text-decoration: none;
+  color: #222;
+}
+
+.f-info-links a:hover {
+  text-decoration: underline;
+}
+
+.filter-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.filter-link:hover .filter {
+  opacity: 1;
+  border-bottom: 2px solid #ddd;
+}
+
+.fa-compass {
+  font-size: 5vh;
+}
+
+#map {
+  height: 600px;
+  width: 100%;
+}
+
+/* =========================================
+  MOBILE NAVBAR FIX (Final Alignment)
+  ========================================= */
+
+@media (max-width: 768px) {
+  
+  /* 1. Container ko bolo: "Wrap mat hona, sab ek line mein raho" */
+  .navbar .container-fluid {
+   flex-wrap: nowrap !important;
+   gap: 5px;
+  }
+
+  /* 2. Search Form: Beech mein rahega aur failne (grow) ki permission */
+  .search-form {
+   margin: 0 !important;
+   flex-grow: 1;
+   min-width: 0;
+   max-width: none;
+  }
+
+  /* 3. Search Input Styling for Mobile */
+  .search-input {
+   width: 100% !important;
+   padding: 0.5rem 2.2rem 0.5rem 0.8rem !important;
+   font-size: 0.85rem;
+  }
+
+  /* 4. Search Button (Magnifying Glass) Position */
+  .search-btn {
+   width: 28px;
+   height: 28px;
+   right: 4px;
+  }
+  .search-btn i {
+   font-size: 0.8rem;
+  }
+
+  /* 5. Logo thoda chota karo taaki jagah baney */
+  .navbar-brand {
+   font-size: 1.3rem;
+   margin-right: 0 !important;
+  }
+
+  /* 6. Hamburger Menu (Toggler) - Fixed on Right */
+  .navbar-toggler {
+   border: none !important;
+   padding: 0 5px !important;
+   margin-left: auto !important;
+   order: 3;
+   flex-shrink: 0;
+  }
+  
+  .navbar-toggler-icon {
+   width: 1.2em; 
+   height: 1.2em;
+  }
+
+  /* Navbar Collapse - Full Width Dropdown */
+  .navbar-collapse {
+   position: absolute;
+   top: 100%;
+   left: 0;
+   right: 0;
+   width: 100%;
+   background: white;
+   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .navbar-nav {
+   flex-direction: column;
+   width: 100%;
+  }
+
+  .navbar-nav .nav-link {
+   padding: 0.75rem 1rem !important;
+   border-radius: 0;
+   text-align: left;
+  }
+
+  /* Tax Toggle Mobile pe nahi dikhana */
+  .tax-toggle {
+   display: none !important;
+  }
+}
+
+/* Very Small Screen Fix (Galaxy Fold / iPhone SE / < 380px) */
+@media (max-width: 380px) {
+  .search-input::placeholder {
+   color: transparent;
+  }
+
+  .search-input {
+   padding: 0.5rem 2rem 0.5rem 0.6rem !important;
+   font-size: 0.8rem;
+  }
+
+  .navbar-brand {
+   font-size: 1.1rem;
+  }
+
+  .search-btn {
+   width: 24px;
+   height: 24px;
+   right: 2px;
+  }
+
+  .search-btn i {
+   font-size: 0.7rem;
+  }
+}
+
+/* Ultra Small Screen (< 300px) */
+@media (max-width: 300px) {
+  .navbar-brand {
+   font-size: 1rem;
+  }
+
+  .search-form {
+   max-width: 120px;
+  }
+
+  .search-input {
+   padding: 0.4rem 2rem 0.4rem 0.5rem !important;
+   font-size: 0.75rem;
+  }
+
+  .navbar-toggler {
+   padding: 0 2px !important;
+  }
+
+  .navbar-toggler-icon {
+   width: 1em; 
+   height: 1em;
+  }
+}
+
+.booking-success-card {
+  animation: popIn 0.6s ease-out;
+}
+
+.success-icon {
+  font-size: 4rem;
+  animation: bounce 1.2s infinite alternate;
+}
+
+.divider {
+  height: 4px;
+  width: 60px;
+  margin: 0 auto;
+  background: linear-gradient(90deg, #198754, #20c997);
+  border-radius: 10px;
+}
+
+/* Animations */
+@keyframes popIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes bounce {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-8px);
+  }
+}
