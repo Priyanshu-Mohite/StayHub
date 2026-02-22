@@ -67,7 +67,7 @@ app.use(cors());
 const store = MongoStore.create({
   mongoUrl: dbUrl,
   crypto: {
-    secret: "mysupersecretkey",
+    secret: process.env.SECRET,
   },
   touchAfter: 24 * 3600,
 });
@@ -80,7 +80,7 @@ store.on("error", (err) => {
 // 3. sessionOptions mein use karo
 const sessionOptions = {
   store: store, // Yahan store connect ho raha hai
-  secret: "mysupersecretkey",
+  secret: process.env.SECRET,
   resave: false,
   saveUninitialized: true,
   cookie: {
