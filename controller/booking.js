@@ -39,30 +39,125 @@
 //   }
 // };
 
+// const Booking = require("../models/booking");
+// // 🔥 STEP 1: Yahan Listing model bhi import kar le, kyunki hume uska version check karna hai
+// const Listing = require("../models/listing");
+
+// module.exports.createBooking = async (req, res) => {
+//   try {
+//     const { listingId, checkIn, checkOut } = req.body;
+//     const userId = req.user._id;
+
+//     const newCheckIn = new Date(checkIn);
+//     const newCheckOut = new Date(checkOut);
+
+//     // 🔥 STEP 2: READ (Listing ka current version uthao)
+//     const listing = await Listing.findById(listingId);
+//     if (!listing) {
+//       req.flash("error", "Listing not found");
+//       return res.redirect("back");
+//     }
+
+//     // 3. Tera original logic: Check if dates overlap
+//     const conflictingBooking = await Booking.findOne({
+//       listing: listingId,
+//       checkIn: { $lt: newCheckOut },
+//       checkOut: { $gt: newCheckIn },
+//     });
+
+//     if (conflictingBooking) {
+//       req.flash("error", "Dates already booked");
+//       return res.redirect("back");
+//     }
+
+//     // 🔥 STEP 3: OPTIMISTIC LOCKING (The Magic)
+//     // Date conflict nahi tha, par save karne se pehle confirm karo kisi aur ne parallel booking toh nahi daal di!
+//     const updatedListing = await Listing.findOneAndUpdate(
+//       {
+//         _id: listingId,
+//         version: listing.version, // SHART: Version wahi hona chahiye jo line 14 pe read kiya tha
+//       },
+//       {
+//         $inc: { version: 1 }, // Success pe version +1 kardo aage walo ke liye
+//       },
+//       { new: true },
+//     );
+
+//     // 🔥 STEP 4: RACE CONDITION DETECTED! (Sneha wala case)
+//     if (!updatedListing) {
+//       console.log("Race condition averted!");
+//       req.flash(
+//         "error",
+//         "Someone else just booked this property a millisecond ago! Please try different dates.",
+//       );
+//       return res.redirect("back"); // Agar payment gateway laga hota, toh uske refund ka code yahan aata
+//     }
+
+//     // 5. SUCCESS (Rahul wala case) - Version match ho gaya, ab aaram se save karo
+//     const newBooking = new Booking({
+//       listing: listingId,
+//       user: userId,
+//       checkIn: newCheckIn,
+//       checkOut: newCheckOut,
+//       totalPrice: 5000,
+//       status: "confirmed",
+//     });
+
+//     await newBooking.save();
+
+//     // ONLY REDIRECT
+//     res.redirect(`/bookings/${newBooking._id}/success`);
+//   } catch (err) {
+//     console.log(err);
+//     res.status(500).send("Something went wrong");
+//   }
+// };
+
+// module.exports.renderSuccess = async (req, res) => {
+//   try {
+//     const booking = await Booking.findById(req.params.id).populate("listing");
+
+//     if (!booking) {
+//       req.flash("error", "Booking not found");
+//       return res.redirect("/bookings");
+//     }
+
+//     res.render("bookings/success", { booking });
+//   } catch (err) {
+//     console.log(err);
+//     res.redirect("/bookings");
+//   }
+// };
+
 const Booking = require("../models/booking");
-// 🔥 STEP 1: Yahan Listing model bhi import kar le, kyunki hume uska version check karna hai
 const Listing = require("../models/listing");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY); // Stripe import (apne hisaab se path adjust kar lena)
 
 module.exports.createBooking = async (req, res) => {
   try {
-    const { listingId, checkIn, checkOut } = req.body;
+    // Frontend se paymentIntentId aani chahiye (Stripe payment confirm hone ke baad)
+    const { listingId, checkIn, checkOut, paymentIntentId } = req.body; 
     const userId = req.user._id;
 
     const newCheckIn = new Date(checkIn);
     const newCheckOut = new Date(checkOut);
 
-    // 🔥 STEP 2: READ (Listing ka current version uthao)
+    // ==========================================
+    // STEP 1: READ (Current State Check Karo)
+    // ==========================================
     const listing = await Listing.findById(listingId);
     if (!listing) {
       req.flash("error", "Listing not found");
       return res.redirect("back");
     }
 
-    // 3. Tera original logic: Check if dates overlap
+    // ==========================================
+    // STEP 2: DATE OVERLAP CHECK (Tera purana logic)
+    // ==========================================
     const conflictingBooking = await Booking.findOne({
       listing: listingId,
       checkIn: { $lt: newCheckOut },
-      checkOut: { $gt: newCheckIn },
+      checkOut: { $gt: newCheckIn }
     });
 
     if (conflictingBooking) {
@@ -70,62 +165,60 @@ module.exports.createBooking = async (req, res) => {
       return res.redirect("back");
     }
 
-    // 🔥 STEP 3: OPTIMISTIC LOCKING (The Magic)
-    // Date conflict nahi tha, par save karne se pehle confirm karo kisi aur ne parallel booking toh nahi daal di!
+    // ==========================================
+    // STEP 3: OPTIMISTIC LOCKING (The Masterstroke)
+    // ==========================================
+    // Payment ho chuki hai, ab finally DB mein likhne se pehle version check karo
     const updatedListing = await Listing.findOneAndUpdate(
-      {
-        _id: listingId,
-        version: listing.version, // SHART: Version wahi hona chahiye jo line 14 pe read kiya tha
+      { 
+        _id: listingId, 
+        version: listing.version // CONDITION: Version wahi ho jo Step 1 me mila tha
       },
-      {
-        $inc: { version: 1 }, // Success pe version +1 kardo aage walo ke liye
+      { 
+        $inc: { version: 1 }     // SUCCESS PE: Version ko +1 badha do
       },
-      { new: true },
+      { new: true }
     );
 
-    // 🔥 STEP 4: RACE CONDITION DETECTED! (Sneha wala case)
+    // ==========================================
+    // STEP 4: RACE CONDITION DETECTED! (The Refund Logic)
+    // ==========================================
     if (!updatedListing) {
-      console.log("Race condition averted!");
-      req.flash(
-        "error",
-        "Someone else just booked this property a millisecond ago! Please try different dates.",
-      );
-      return res.redirect("back"); // Agar payment gateway laga hota, toh uske refund ka code yahan aata
+      console.log("CRITICAL: Version Mismatch detected. Initiating Refund...");
+
+      // Agar Stripe se payment ho chuki thi, toh usko turant refund maro
+      if (paymentIntentId) {
+        await stripe.refunds.create({
+          payment_intent: paymentIntentId,
+        });
+        console.log(`Refund successful for Payment Intent: ${paymentIntentId}`);
+      }
+
+      req.flash("error", "Sorry! Someone else booked these dates while your payment was processing. Your money has been refunded.");
+      return res.redirect(`/listings/${listingId}`); 
     }
 
-    // 5. SUCCESS (Rahul wala case) - Version match ho gaya, ab aaram se save karo
+    // ==========================================
+    // STEP 5: SUCCESS (Save the Booking)
+    // ==========================================
     const newBooking = new Booking({
       listing: listingId,
       user: userId,
       checkIn: newCheckIn,
       checkOut: newCheckOut,
-      totalPrice: 5000,
-      status: "confirmed",
+      totalPrice: 5000, // Ise apne hisaab se dynamic kar lena
+      status: "confirmed"
     });
 
     await newBooking.save();
 
-    // ONLY REDIRECT
+    // SUCCESS REDIRECT
     res.redirect(`/bookings/${newBooking._id}/success`);
+
   } catch (err) {
-    console.log(err);
-    res.status(500).send("Something went wrong");
-  }
-};
-
-module.exports.renderSuccess = async (req, res) => {
-  try {
-    const booking = await Booking.findById(req.params.id).populate("listing");
-
-    if (!booking) {
-      req.flash("error", "Booking not found");
-      return res.redirect("/bookings");
-    }
-
-    res.render("bookings/success", { booking });
-  } catch (err) {
-    console.log(err);
-    res.redirect("/bookings");
+    console.error("Booking Error:", err);
+    req.flash("error", "Something went wrong during the booking process.");
+    res.redirect("back");
   }
 };
 
