@@ -67,6 +67,12 @@ const listingSchema = new Schema({
       "Boats",
     ],
   },
+
+  // Baaki schema fields upar honge...
+  version: {
+    type: Number,
+    default: 1,
+  },
 });
 
 listingSchema.post("findOneAndDelete", async (listing) => {
