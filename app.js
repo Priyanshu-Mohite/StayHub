@@ -15,7 +15,7 @@ const ejsMate = require("ejs-mate");
 const cors = require("cors");
 
 // MongoDB URL
-// const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
+const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
 
 const dbUrl = process.env.ATLASDB_URL;  
 
@@ -35,14 +35,14 @@ const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
 const bookingRouter = require("./routes/booking.js");
 const paymentRouter = require("./routes/payment.js");
-
+const paymentController = require("./controller/payments.js"); 
 
 // import {asyncHandler} from './utils/wrapAsync.js';
 
 // connect to MongoDB
 async function main() {
   try {
-    await mongoose.connect(dbUrl);
+    await mongoose.connect(MONGO_URL);
     console.log("MongoDB connected");
   } catch (err) {
     console.log("MongoDB connection error:", err);
@@ -53,6 +53,9 @@ async function main() {
 main();
 
 // app.post("/webhook", express.raw({ type: "application/json" }), paymentController.webhook);
+
+// THE WEBHOOK ROUTE (Yahan express.raw() zaroori hai)
+app.post("/webhook", express.raw({ type: "application/json" }), paymentController.webhook);
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -65,7 +68,7 @@ app.use(cors());
 
 // 1. Store define karo
 const store = MongoStore.create({
-  mongoUrl: dbUrl,
+  mongoUrl: MONGO_URL,
   crypto: {
     secret: process.env.SECRET,
   },

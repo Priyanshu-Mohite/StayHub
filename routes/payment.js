@@ -62,25 +62,32 @@ router.get("/checkout", async (req, res) => {
 router.post("/create-payment-intent", express.json(), paymentController.createPaymentIntent);
 
 // 3. Success Page
-router.get("/success", async (req, res) => {
-    try {
-        // Stripe URL mein payment_intent bhejta hai
-        const { payment_intent } = req.query;
+// router.get("/success", async (req, res) => {
+//     try {
+//         // Stripe URL mein payment_intent bhejta hai
+//         const { payment_intent } = req.query;
 
-        // Agar payment_intent nahi hai, toh seedha listing par bhejo (Direct access roka)
-        if (!payment_intent) {
-            req.flash("error", "Payment details missing!");
-            return res.redirect("/listings");
-        }
+//         // Agar payment_intent nahi hai, toh seedha listing par bhejo (Direct access roka)
+//         if (!payment_intent) {
+//             req.flash("error", "Payment details missing!");
+//             return res.redirect("/listings");
+//         }
 
-        // Controller ko bolo: "Booking Confirm karo"
-        await paymentController.verifyAndCreateBooking(req, res);
+//         // Controller ko bolo: "Booking Confirm karo"
+//         await paymentController.verifyAndCreateBooking(req, res);
 
-    } catch (err) {
-        console.error("Success Route Error:", err);
-        req.flash("error", "Error confirming booking");
-        res.redirect("/listings");
-    }
+//     } catch (err) {
+//         console.error("Success Route Error:", err);
+//         req.flash("error", "Error confirming booking");
+//         res.redirect("/listings");
+//     }
+// });
+
+// NAYA SUCCESS ROUTE (Sirf UI dikhane ke liye, logic Webhook karega)
+router.get("/success", (req, res) => {
+    // Ab yahan koi payment_intent check karne ki ya DB save karne ki zaroorat nahi hai.
+    // Webhook background me wo kaam pehle hi kar chuka hoga.
+    res.render("payments/success.ejs");
 });
 
 module.exports = router;
