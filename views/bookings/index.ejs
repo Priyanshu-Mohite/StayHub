@@ -29,6 +29,34 @@
             >
           </div>
           
+          <div class="col-md-8">
+            <div class="card-body p-4">
+              <h4 class="card-title fw-bold"><%= booking.listing.title %></h4>
+              <p class="card-text text-muted mb-2">
+                <i class="bi bi-geo-alt-fill text-danger"></i> <%= booking.listing.location %>, <%= booking.listing.country %>
+              </p>
+              
+              <hr class="text-muted">
+              
+              <div class="row mt-3">
+                <div class="col-6">
+                  <p class="mb-1 text-muted small">Check-in</p>
+                  <p class="fw-semibold"><%= booking.checkIn.toLocaleDateString('en-IN') %></p>
+                </div>
+                <div class="col-6">
+                  <p class="mb-1 text-muted small">Check-out</p>
+                  <p class="fw-semibold"><%= booking.checkOut.toLocaleDateString('en-IN') %></p>
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center mt-3">
+                <p class="mb-0 fw-bold fs-5 text-dark">
+                  Total: ₹ <%= booking.totalPrice.toLocaleString('en-IN') %>
+                </p>
+                <span class="badge bg-success px-3 py-2 rounded-pill">Confirmed</span>
+              </div>
+            </div>
+          </div>
           <% } else { %>
           <div class="col-12 p-4 text-center">
             <div class="alert alert-danger mb-0">
