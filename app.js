@@ -15,7 +15,7 @@ const ejsMate = require("ejs-mate");
 const cors = require("cors");
 
 // MongoDB URL
-const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
+// const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
 
 const dbUrl = process.env.ATLASDB_URL;  
 
@@ -42,7 +42,7 @@ const paymentController = require("./controller/payments.js");
 // connect to MongoDB
 async function main() {
   try {
-    await mongoose.connect(MONGO_URL);
+    await mongoose.connect(dbUrl);
     console.log("MongoDB connected");
   } catch (err) {
     console.log("MongoDB connection error:", err);
@@ -68,7 +68,7 @@ app.use(cors());
 
 // 1. Store define karo
 const store = MongoStore.create({
-  mongoUrl: MONGO_URL,
+  mongoUrl: dbUrl,
   crypto: {
     secret: process.env.SECRET,
   },
