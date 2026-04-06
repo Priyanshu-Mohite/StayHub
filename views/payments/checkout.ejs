@@ -88,8 +88,8 @@
         const { error } = await stripe.confirmPayment({
             elements,
             confirmParams: {
-                // Success hone par kahan jana hai
-                return_url: "http://localhost:8080/success", 
+                // Ye automatically check karega ki tu abhi kis URL par hai (localhost ya render)
+                return_url: window.location.origin + "/success", // ✅ THE FIX
             },
         });
 
